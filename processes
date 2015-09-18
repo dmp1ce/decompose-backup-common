@@ -59,6 +59,9 @@ _decompose-process-generate_backup_server_ssh_access_key() {
 
   echo "Generating SSH access keys..."
   ssh-keygen -f $output_dir/id_rsa -N "" -C "$PROJECT_BACKUP_SSH_COMMENT"
+
+  # Generate known_hosts
+  ssh-keyscan -H $PROJECT_BACKUP_SERVER_IP > $output_dir/known_hosts
 }
 _decompose-process-generate_backup_server_ssh_access_key_help() {
   echo "  Generate SSH access keys for backup server"
