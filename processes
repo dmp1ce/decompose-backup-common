@@ -7,7 +7,7 @@ _decompose-process-generate_gpg_backup_keys() {
   local project_root=$(_decompose-project-root)
 
   local random_passphrase=$(cat /dev/urandom | tr -cd 'a-z0-9' | head -c 8)
-  local output_dir=$(realpath $project_root/$PROJECT_BACKUP_GPG_OUTPUT_DIR)
+  local output_dir=$(realpath $project_root/$PROJECT_BACKUP_GPG_KEY_DIR)
 
 gpg --batch --gen-key <<EOT
 %echo Generating a default key
@@ -46,7 +46,19 @@ _decompose-process-generate_gpg_backup_keys_help() {
 }
 
 _decompose-process-generate_backup_server_ssh_access_key() {
+  local project_root=$(_decompose-project-root)
+  local output_dir=$(realpath $project_root/$PROJECT_BACKUP_SSH_KEY_DIR)
+
+  # Verify that the keys don't exist already
+  if [ -e "$output_dir/id_rsa" ]; then
+    echo "SSH keys already exist here:"
+    echo "$output_dir"
+    echo "Aborting"
+    exit 1
+  fi
+
   echo "Generating SSH access keys..."
+  ssh-keygen -f $output_dir/id_rsa -N "" -C "$PROJECT_BACKUP_SSH_COMMENT"
 }
 _decompose-process-generate_backup_server_ssh_access_key_help() {
   echo "  Generate SSH access keys for backup server"
