@@ -1,5 +1,56 @@
 # Provides processes help backup projects
-DECOMPOSE_BACKUP_PROCESSES=( 'backup_config' )
+DECOMPOSE_BACKUP_PROCESSES=( 'backup_config' 'generate_gpg_backup_keys'
+  'generate_backup_server_ssh_access_key' )
+
+_decompose-process-generate_gpg_backup_keys() {
+  echo "Generating GPG backup keys..."
+  local project_root=$(_decompose-project-root)
+
+  local random_passphrase=$(cat /dev/urandom | tr -cd 'a-z0-9' | head -c 8)
+  local output_dir=$(realpath $project_root/$PROJECT_BACKUP_GPG_OUTPUT_DIR)
+
+gpg --batch --gen-key <<EOT
+%echo Generating a default key
+Key-Type: default
+Key-Length: 2048
+Subkey-Type: default
+Name-Real: $PROJECT_BACKUP_GPG_REALNAME
+Name-Comment: $PROJECT_BACKUP_GPG_COMMENT
+Name-Email: $PROJECT_BACKUP_GPG_EMAIL
+Expire-Date: 0
+Passphrase: $random_passphrase
+%pubring foo.pub
+%secring foo.sec
+# Do a commit here, so that we can later print "done" :-)
+%commit
+%echo done
+EOT
+
+  # Get key ID
+  local keyid=$(gpg --no-default-keyring --secret-keyring ./foo.sec --keyring ./foo.pub --list-keys | grep "pub" | sed -n -e 's/^pub.*\///p' | sed -n -e 's/\s*[-0-9]*$//p')
+
+  # Export public key
+  gpg --no-default-keyring --secret-keyring ./foo.sec --keyring ./foo.pub --armour --export > $output_dir/gpgkey."$keyid".pub.asc
+
+  # TODO: Check for gpg 2.1 and warn about allow-loopback-pinentry settings
+  # Export private key
+  gpg --batch --pinentry-mode loopback --passphrase "$random_passphrase" --no-default-keyring --secret-keyring ./foo.sec --keyring ./foo.pub --armour --export-secret-keys > $output_dir/gpgkey."$keyid".sec.asc
+
+  # Remove original keyring
+  rm ./foo.pub
+
+  echo "Generated key ($keyid) with the passphrase: $random_passphrase"
+}
+_decompose-process-generate_gpg_backup_keys_help() {
+  echo "  Generate GPG backup keys for use with Duply"
+}
+
+_decompose-process-generate_backup_server_ssh_access_key() {
+  echo "Generating SSH access keys..."
+}
+_decompose-process-generate_backup_server_ssh_access_key_help() {
+  echo "  Generate SSH access keys for backup server"
+}
 
 _decompose-process-backup_config() {
   echo "Backing up config..."
