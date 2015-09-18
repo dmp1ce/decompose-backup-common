@@ -1,0 +1,27 @@
+# Provides processes help backup projects
+DECOMPOSE_BACKUP_PROCESSES=( 'backup_config' )
+
+_decompose-process-backup_config() {
+  echo "Backing up config..."
+  local project_root=$(_decompose-project-root)
+
+  local string_time=$(date +%s)
+  local config_name=$PROJECT_BACKUP_CONFIG_NAME
+  # Expand INCLUDES
+  local include_files="$(cd $project_root && echo $PROJECT_BACKUP_INCLUDES)"
+
+  # TODO: Allow for multiple EXCLUDE patterns
+  mkdir -p "$project_root"/backup_config
+  tar -C "$project_root" \
+    -cvzf "$project_root"/backup_config/$config_name-config-$string_time".tar.gz" \
+    --exclude-vcs \
+    --exclude="$PROJECT_BACKUP_EXCLUDES" \
+    $include_files
+}
+_decompose-process-backup_config_help() {
+  local project_root=$(_decompose-project-root)
+  echo "  Creates backup file of the current configuration for safe keeping"
+  echo "  File is copied to '$project_root/backup_config' directory"
+}
+
+# vim:syntax=sh
