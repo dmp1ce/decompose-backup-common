@@ -6,7 +6,7 @@ _decompose-process-generate_gpg_backup_keys() {
   echo "Generating GPG backup keys..."
   local project_root=$(_decompose-project-root)
 
-  local random_passphrase=$(cat /dev/urandom | tr -cd 'a-z0-9' | head -c 8)
+  local random_passphrase=$(cat /dev/urandom | tr -cd 'a-zA-Z0-9' | head -c 8)
   local output_dir=$(realpath $project_root/$PROJECT_BACKUP_GPG_KEY_DIR)
 
 gpg --batch --gen-key <<EOT
