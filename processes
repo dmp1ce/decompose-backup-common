@@ -1,6 +1,6 @@
 # Provides processes help backup projects
 DECOMPOSE_BACKUP_PROCESSES=( 'backup_config' 'generate_gpg_backup_keys'
-  'generate_backup_server_ssh_access_key' )
+  'generate_backup_server_ssh_access_key' 'list-backups' )
 
 _decompose-process-generate_gpg_backup_keys() {
   echo "Generating GPG backup keys..."
@@ -88,6 +88,17 @@ _decompose-process-backup_config_help() {
   local project_root=$(_decompose-project-root)
   echo "  Creates backup file of the current configuration for safe keeping"
   echo "  File is copied to '$project_root/backup_config' directory"
+}
+
+_decompose-process-list-backups() {
+  # Get the name of the backup container
+  local cid=$(docker-compose ps -q backup)
+
+  # Use duply to list backups
+  docker exec -it $cid duply site_data status
+}
+_decompose-process-list-backups_help() {
+  echo "  List available backups"
 }
 
 # vim:syntax=sh
