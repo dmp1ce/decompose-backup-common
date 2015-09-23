@@ -10,6 +10,7 @@ apt-get install -y -q --no-install-recommends \
   mariadb-client \
   openssh-client \
   python-paramiko \
+  dateutils \
 && apt-get clean \
 && rm -r /var/lib/apt/lists/*
 
