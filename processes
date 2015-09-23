@@ -94,8 +94,11 @@ _decompose-process-list-backups() {
   # Get the name of the backup container
   local cid=$(docker-compose ps -q backup)
 
-  # Use duply to list backups
-  docker exec -it $cid duply site_data status
+  # Use duply to list backups and command line magic (craziness)
+  # TODO: For readability, this code should probably go into a seperate file.
+  echo "Backups available from the following dates:"
+  docker exec $cid bash -c "duply site_data status | grep 'Incremental\|Full' | awk '{\$1 = \"\"; \$NF = \"\"; print}' | xargs -I {} date -d \"{}\" \"+%Y-%m-%dT%H:%M:%S%:z\" | xargs -I {} sh -c 'echo \"\$1 (\$(dateutils.ddiff \$1 now -f '%YY%mM%dD%Hh%Mm%Ss') ago)\"' - {}"
+#  docker exec $cid dateutils.ddiff --help
 }
 _decompose-process-list-backups_help() {
   echo "  List available backups"
