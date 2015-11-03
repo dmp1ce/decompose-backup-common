@@ -91,6 +91,15 @@ _decompose-process-backup_config() {
     --exclude-vcs \
     $exclude_string \
     $include_files
+
+  # TODO: Copy to backup container in the right directory so that they will be remotely backup up as well.
+  local cid=$(docker-compose ps -q backup)
+
+  if [ ! -z "$cid" ]; then
+    echo -n "Copying configuration backup to backup service for remote backup... "
+    docker cp $project_root/backup_config/. $cid:/home/duply/backup_config
+    echo "Done"
+  fi
 }
 _decompose-process-backup_config_help() {
   local project_root=$(_decompose-project-root)
