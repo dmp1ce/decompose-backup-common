@@ -29,9 +29,10 @@ RUN chmod -R 700 /home/duply/.ssh &&\
 # Create directory for exporting sql
 RUN mkdir -p /srv/http/sql_backup && chmod 777 /srv/http/sql_backup
 
-# Copy backup service script
-COPY backup_service /home/duply/backup_service
-RUN chown duply:duply /home/duply/backup_service
+# Add GPG keys for encrypting config tars
+COPY public_keys /home/duply/public_keys
+COPY load_developer_keys /home/duply/
+RUN chmod +x /home/duply/load_developer_keys
 
 # Run as user
 USER duply
@@ -39,8 +40,14 @@ USER duply
 # Build site
 WORKDIR /home/duply
 
+# Load the public keys into key chain for encrypting config tars
+RUN ./load_developer_keys
+
 # For development backups
 RUN mkdir /home/duply/backup && touch /home/duply/backup/.keep
+
+# Copy backup service script
+COPY backup_service /home/duply/backup_service
 
 # Run backup service script by default
 CMD /home/duply/backup_service
