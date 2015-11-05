@@ -121,4 +121,33 @@ _decompose-process-list-backups_help() {
   echo "  List available backups"
 }
 
+_decompose-process-restore-db() {
+  if [ ! "$1" ]; then
+    echo "Please use an '<age>' for the database to restore"
+    echo "See Duply Time Formats: http://duply.net/wiki/index.php/Duply-documentation"
+    exit 1
+  fi
+
+  echo "Restoring database from date '$1'"
+
+  # Get the name of the backup container
+  local cid=$(docker-compose ps -q backup)
+
+  # Use duply to restore database backup file
+  docker exec $cid duply site_data fetch sql_backup/app.sql.gz /tmp/app.sql.gz $1
+
+  # Restore
+  local password_param=""
+  if [ "$PROJECT_DB_PASSWORD" ]; then
+    local password_param="-p$PROJECT_DB_PASSWORD"
+  fi
+  docker exec $cid bash -c "test -f /tmp/app.sql.gz && gzip -d < /tmp/app.sql.gz | mysql -u $PROJECT_DB_USER $password_param -h db -D $PROJECT_DB_DATABASE"
+
+  # Cleanup restore files
+  docker exec $cid bash -c "test -f /tmp/app.sql.gz && rm /tmp/app.sql.gz"
+}
+_decompose-process-restore-db_help() {
+  echo "  Restore database from a specified date"
+}
+
 # vim:syntax=sh
