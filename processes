@@ -1,6 +1,6 @@
 # Provides processes help backup projects
 DECOMPOSE_BACKUP_PROCESSES=( 'backup_config' 'generate_gpg_backup_keys'
-  'generate_backup_server_ssh_access_key' 'list-backups' )
+  'generate_backup_server_ssh_access_key' 'list-backups' 'restore-db' )
 
 _decompose-process-generate_gpg_backup_keys() {
   echo "Generating GPG backup keys..."
