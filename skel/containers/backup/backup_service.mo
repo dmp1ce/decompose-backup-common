@@ -32,7 +32,7 @@ while true; do
   fi
 
   current_epoch=$(date +%s)
-  target_epoch=$(date -d 'TZ="UTC" tomorrow 0500' +%s)
+  target_epoch=$(date -d '{{PROJECT_BACKUP_SCHEDULED_TIME}}' +%s)
   sleep_seconds=$(( $target_epoch - $current_epoch ))
   echo "Waiting '$sleep_seconds' seconds for next backup"
 
