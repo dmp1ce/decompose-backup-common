@@ -3,7 +3,7 @@
 echo 'Waiting 10 seconds for things to start up and settle down...'
 sleep 10
 
-# Every day at 05:00 UTC do a backup
+# Every day at a scheduled time do a backup
 while true; do
   echo "Backing up site data"
   duply site_data backup
