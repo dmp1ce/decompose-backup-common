@@ -87,7 +87,7 @@ TARGET='{{PROJECT_BACKUP_TARGET}}'
 
 # base directory to backup
 #SOURCE='/path/of/source'
-SOURCE='/srv/http'
+SOURCE='{{PROJECT_BACKUP_SOURCE}}'
 
 # a command that runs duplicity e.g. 
 #  shape bandwidth use via trickle
