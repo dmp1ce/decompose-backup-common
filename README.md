@@ -49,6 +49,7 @@ In this way, the backup server cannot read any of the backup data and can be low
 - `PROJECT_BACKUP_EXCLUDES` : Specify files to ignore from configuration backup. Use space character (` `) as delimiter. Default is `.gitmodules`.
 - `PROJECT_BACKUP_GPG_KEY` : The GPG key ID. This is not set by default. The key ID should be the same name as the file. Example: `9BE46F55`.
 - `PROJECT_BACKUP_GPG_PW` : The GPG key encryption password. Default is not set. Example: `MySecretPassword1234`.
+- `PROJECT_BACKUP_SOURCE` : The location of the source to backup. Default is `/srv/http/source`.
 - `PROJECT_BACKUP_TARGET` : The full Duply path to where the Duply backup should be saved. Default is not set. Example: `ssh://backupuser@backupserver/myproject_path`.
 - `PROJECT_BACKUP_CONFIG_TARGET` : The full SSH path to where the backup configuration should be saved. Default is not set. Example: `backupuser@backupserver:myproject_configuration_path`. NOTICE: There is a syntax difference between `PROJECT_BACKUP_TARGET` and `PROJECT_BACKUP_CONFIG_TARGET` in the paths.
 
