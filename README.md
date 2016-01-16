@@ -15,7 +15,7 @@ Include this library and source `elements` and `processes` files your main decom
 First add lib as a submodule to your environment:
 ``` bash
 $ cd .decompose/environment
-$ git submodule add https://github.com/dmp1ce/decompose-backup-common.git lib/common
+$ git submodule add https://github.com/dmp1ce/decompose-backup-common.git lib/backup
 ```
 
 Then make your `processes` and `elements` file look like this:
@@ -26,6 +26,7 @@ source $(_decompose-project-root)/.decompose/environment/lib/backup/elements
 $ cat processes
 # Include common processes
 source $(_decompose-project-root)/.decompose/environment/lib/backup/processes
+DECOMPOSE_PROCESSES=( "${DECOMPOSE_BACKUP_PROCESSES[@]}" )
 ```
 
 ## Environment configuration backup
