@@ -85,9 +85,11 @@ _decompose-process-backup_config() {
     exclude_string=$exclude_string" --exclude=$exclude"
   done
 
-  mkdir -p "$project_root"/backup_config
+  local config_backup_dirname="$PROJECT_BACKUP_CONFIG_BACKUP_DIRECTORY"
+
+  mkdir -p "$project_root"/$config_backup_dirname
   tar -C "$project_root" \
-    -cvzf "$project_root"/backup_config/$config_name-config-$string_time".tar.gz" \
+    -cvzf "$project_root"/$config_backup_dirname/$config_name-config-$string_time".tar.gz" \
     --exclude-vcs \
     $exclude_string \
     $include_files
@@ -97,14 +99,14 @@ _decompose-process-backup_config() {
 
   if [ ! -z "$cid" ]; then
     echo -n "Copying configuration backup to backup service for remote backup... "
-    docker cp $project_root/backup_config/. $cid:/home/duply/backup_config
+    docker cp $project_root/$config_backup_dirname/. $cid:/home/duply/$config_backup_dirname
     echo "Done"
   fi
 }
 _decompose-process-backup_config_help() {
   local project_root=$(_decompose-project-root)
   echo "  Creates backup file of the current configuration for safe keeping"
-  echo "  File is copied to '$project_root/backup_config' directory"
+  echo "  File is copied to '$project_root/config_backup' directory"
 }
 
 _decompose-process-list-backups() {
