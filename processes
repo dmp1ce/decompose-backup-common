@@ -94,7 +94,7 @@ _decompose-process-backup_config() {
     $exclude_string \
     $include_files
 
-  # TODO: Copy to backup container in the right directory so that they will be remotely backup up as well.
+  # Copy to backup container in the right directory so that they will be remotely backup up as well.
   local cid=$(docker-compose ps -q backup)
 
   if [ ! -z "$cid" ]; then
