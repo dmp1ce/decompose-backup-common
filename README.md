@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/dmp1ce/decompose-backup-common.svg?branch=master)](https://travis-ci.org/dmp1ce/decompose-backup-common)
 # decompose-backup-common
 Common code for backup processes in decompose environments
 
