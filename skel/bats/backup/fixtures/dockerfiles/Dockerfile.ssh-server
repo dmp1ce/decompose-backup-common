@@ -1,0 +1,39 @@
+#FROM alpine
+FROM debian
+MAINTAINER David Parrish <daveparrish@tutanota.com>
+
+# COPY 'tester' ssh key to authorized_keys
+COPY client_files/id_rsa.pub /tmp/
+
+# Install openssh
+# Create 'tester' user
+# Add 'tester' ssh key to authorized_keys
+#RUN apk add --update openssh && \
+#chmod 777 /tmp/id_rsa.pub && \
+#adduser -D tester && \
+#passwd -u -d tester && \
+#su -c "chmod 744 /home/tester && \
+#mkdir -p ~/.ssh && \
+#chmod 700 ~/.ssh && \
+#cat /tmp/id_rsa.pub >> ~/.ssh/authorized_keys && \
+#chmod 600 ~/.ssh/authorized_keys" tester
+RUN apt-get update -yq && \
+apt-get install -yq --no-install-recommends openssh-server adduser && \
+chmod 777 /tmp/id_rsa.pub && \
+useradd -m tester && \
+passwd -u -d tester && \
+mkdir /var/run/sshd && \
+su -c "chmod 744 /home/tester && \
+mkdir -p ~/.ssh && \
+chmod 700 ~/.ssh && \
+cat /tmp/id_rsa.pub >> ~/.ssh/authorized_keys && \
+chmod 600 ~/.ssh/authorized_keys" tester
+
+# Copy host keys and configuration files
+COPY dockerfiles/ssh-server-files/host/. /etc/ssh
+
+# Expose port to access sshd
+EXPOSE 22
+
+# Start sshd
+CMD /usr/sbin/sshd -D

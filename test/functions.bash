@@ -8,20 +8,31 @@ function setup_testing_environment() {
 
   # Build testing image
   local project_directory=$(readlink -f "$DIR/../")
+  local tmp_tester_build="/tmp/decompose-docker-backup-testing"
   # Copy volume so we can safely dereference symlinks
   # Create docker container for doing tests
-  testing_env_build=$(docker run -v $project_directory:/project --rm --link decompose-docker-backup-testing:docker docker sh -c "cp -rL /project /project-no-symlinks && docker build -t tester /project-no-symlinks/test/bats/fixtures/docker-compose/.")
+  cp -rL "$project_directory/." "$tmp_tester_build"
+  cp "$project_directory/test/Dockerfile.tester" "$tmp_tester_build/Dockerfile"
+  local testing_env_build=$(docker build -t decompose-docker-backup-testing-tester "$tmp_tester_build/.")
   [ "$?" == "1" ] && echo "$testing_env_build"
 }
 
 function run_tests() {
-  echo "Running BATS tests"
-  bats "$DIR/bats/dind.bats"
+  local tester_image="docker run --rm --link decompose-docker-backup-testing:docker \
+decompose-docker-backup-testing-tester"
+
+  $tester_image bats /app/skel/bats/backup
 }
 
 function teardown_testing_environment() {
   echo "Teardown Docker testing environment ..."
-  testing_env_cleanup=$(docker rm -f decompose-docker-backup-testing)
+  testing_env_cleanup=$(docker rm -fv decompose-docker-backup-testing)
+  [ "$?" == "1" ] && echo "$testing_env_cleanup"
+
+	local tmp_tester_build="/tmp/decompose-docker-backup-testing"
+  mv "$tmp_tester_build" "$tmp_tester_build-$(uuidgen)"
+
+  testing_env_cleanup=$(docker rmi decompose-docker-backup-testing-tester)
   [ "$?" == "1" ] && echo "$testing_env_cleanup"
 }
 

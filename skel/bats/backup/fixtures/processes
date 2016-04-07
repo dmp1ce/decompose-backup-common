@@ -1,0 +1,2 @@
+# Load backup processes
+DECOMPOSE_PROCESSES=( "${DECOMPOSE_BACKUP_PROCESSES[@]}" )

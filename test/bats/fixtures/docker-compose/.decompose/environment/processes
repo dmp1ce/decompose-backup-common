@@ -1,2 +1,0 @@
-source $(_decompose-project-root)/.decompose/environment/lib/backup/processes
-DECOMPOSE_PROCESSES=( "${DECOMPOSE_BACKUP_PROCESSES[@]}" )

@@ -1,4 +1,0 @@
-version: '2'
-services:
-  test_service:
-    build: .

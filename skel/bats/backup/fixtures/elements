@@ -1,0 +1,13 @@
+# journald not available in container.
+PROJECT_DOCKER_LOG_DRIVER=none
+
+# Remote backup server settings
+PROJECT_BACKUP_GPG_KEY="A25AC16E"
+PROJECT_BACKUP_GPG_PW="FOrd5ewX"
+#PROJECT_BACKUP_TARGET="ssh://tester@123.123.123.123/backup"
+#PROJECT_BACKUP_CONFIG_TARGET="tester@123.123.123.123:backup_configuration"
+
+# mysql data
+PROJECT_DB_USER="tester"
+PROJECT_DB_DATABASE="test_db"
+PROJECT_DB_PASSWORD="password"
