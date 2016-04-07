@@ -8,9 +8,12 @@ load "$BATS_TEST_DIRNAME/bats_functions.bash"
 @test "Build required containers for backup tests" {
   cd "$WORKING"
 
-  echo "Start backup destination server running ssh"
-  docker build -t "decompose-backup-ssh-server-tester" -f dockerfiles/Dockerfile.ssh-server .
-  docker run --name decompose-backup-ssh-server-tester-instance -d decompose-backup-ssh-server-tester
+  # NOTICE: Due to SSH server IP changing and no support for automatic fingerprint acceptance
+  # this test does not use the SSH server, but instead uses a local directory for backup tests.
+  #
+  #echo "Start backup destination server running ssh"
+  #docker build -t "decompose-backup-ssh-server-tester" -f dockerfiles/Dockerfile.ssh-server .
+  #docker run --name decompose-backup-ssh-server-tester-instance -d decompose-backup-ssh-server-tester
 
   echo "Start mysql compatible server"
   docker run --name decompose-backup-mariadb-tester-instance \
@@ -22,34 +25,32 @@ load "$BATS_TEST_DIRNAME/bats_functions.bash"
   # TODO: Populate test_db database with some data.
 
   echo "Build backup source container"
-  echo "PROJECT_BACKUP_TARGET=\"ssh://tester@$(echo_ssh_ip)/backup\"" >> "$WORKING/.decompose/elements"
-  echo "PROJECT_BACKUP_CONFIG_TARGET=\"tester@$(echo_ssh_ip):backup_configuration\"" >> "$WORKING/.decompose/elements"
+  #echo "PROJECT_BACKUP_TARGET=\"ssh://tester@$(echo_ssh_ip)/backup\"" >> "$WORKING/.decompose/elements"
+  #echo "PROJECT_BACKUP_CONFIG_TARGET=\"tester@$(echo_ssh_ip):backup_configuration\"" >> "$WORKING/.decompose/elements"
   decompose --build
   cp client_files/gpgkey.* containers/backup/.duply/site_data
-  cp client_files/id_rsa* containers/backup/.ssh
-  cp client_files/known_hosts containers/backup/.ssh
+  #cp client_files/id_rsa* containers/backup/.ssh
+  # TODO: Generate known_hosts file with ssh-keyscan
+  #cp client_files/known_hosts containers/backup/.ssh
   docker build -t "decompose-backup-source-tester" containers/backup/.
 }
 
 @test "Can ping test services by IP" {
-  # Wait for projects to start
-  sleep 5
-  ping -c 1 $(echo_ssh_ip)
-  ping -c 1 $(echo_mariadb_ip)
+  #ping -c 1 $(echo_ssh_ip)
+  docker run --rm --link "decompose-backup-mariadb-tester-instance:db" decompose-backup-source-tester ping -c 1 $(echo_mariadb_ip)
 }
 
 @test "Run backup" {
   cd "$WORKING" 
 
-  # Wait for mariadb to start up
-  sleep 20
-  docker exec decompose-backup-ssh-server-tester-instance ls -alh /etc/ssh
-  docker run --rm --link "decompose-backup-mariadb-tester-instance:db" decompose-backup-source-tester duply site_data backup  
+  # TODO: Create volume for backup so backup results can be checked more easily.
+
+  docker run --rm --link "decompose-backup-mariadb-tester-instance:db" decompose-backup-source-tester bash -c "mkdir -p /tmp/{backup_test,config_backup_test} && duply site_data backup && ls -alh /tmp/backup_test && ls -alh /tmp/config_backup_test"
 }
 
 @test "Remove docker containers created for tests" {
   #skip "For local debugging of tests"
-  docker rm -fv decompose-backup-ssh-server-tester-instance
+  #docker rm -fv decompose-backup-ssh-server-tester-instance
   docker rm -fv decompose-backup-mariadb-tester-instance
 }
 
@@ -69,7 +70,7 @@ function echo_container_name_ip() {
 
 function setup() {
   setup_testing_environment
-} 
+}
 
 function teardown() {
   teardown_testing_environment
