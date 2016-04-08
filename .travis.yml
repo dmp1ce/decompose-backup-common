@@ -17,4 +17,4 @@ before_install:
   - sudo chmod +x /usr/local/bin/docker-compose
 
 script:
-  - bats ./skel/bats/backup
+  - bats ./test/bats
