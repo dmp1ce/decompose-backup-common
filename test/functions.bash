@@ -21,7 +21,7 @@ function run_tests() {
   local tester_image="docker run --rm --link decompose-docker-backup-testing:docker \
 decompose-docker-backup-testing-tester"
 
-  $tester_image bats /app/skel/bats/backup
+  $tester_image bats /app/test/bats
 }
 
 function teardown_testing_environment() {
@@ -35,4 +35,3 @@ function teardown_testing_environment() {
   testing_env_cleanup=$(docker rmi decompose-docker-backup-testing-tester)
   [ "$?" == "1" ] && echo "$testing_env_cleanup"
 }
-
