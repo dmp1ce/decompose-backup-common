@@ -29,9 +29,11 @@ function teardown_testing_environment() {
   testing_env_cleanup=$(docker rm -fv decompose-docker-backup-testing)
   [ "$?" == "1" ] && echo "$testing_env_cleanup"
 
-	local tmp_tester_build="/tmp/decompose-docker-backup-testing"
+  local tmp_tester_build="/tmp/decompose-docker-backup-testing"
   mv "$tmp_tester_build" "$tmp_tester_build-$(uuidgen)"
 
   testing_env_cleanup=$(docker rmi decompose-docker-backup-testing-tester)
   [ "$?" == "1" ] && echo "$testing_env_cleanup"
 }
+
+# vim:syntax=sh tabstop=2 shiftwidth=2 expandtab
