@@ -18,43 +18,43 @@ apt-get install -y -q --no-install-recommends \
 RUN useradd -m -s /bin/bash duply
 
 # Copy duply profiles
-COPY .duply/ /home/duply/.duply
-RUN chmod -R 700 /home/duply/.duply &&\
-  chown -R duply:duply /home/duply/.duply
+COPY .duply/ {{PROJECT_BACKUP_USER_HOME}}/.duply
+RUN chmod -R 700 {{PROJECT_BACKUP_USER_HOME}}/.duply &&\
+  chown -R duply:duply {{PROJECT_BACKUP_USER_HOME}}/.duply
 # Copy ssh keys
-COPY .ssh/ /home/duply/.ssh
-RUN chmod -R 700 /home/duply/.ssh &&\
-  chown -R duply:duply /home/duply/.ssh
+COPY .ssh/ {{PROJECT_BACKUP_USER_HOME}}/.ssh
+RUN chmod -R 700 {{PROJECT_BACKUP_USER_HOME}}/.ssh &&\
+  chown -R duply:duply {{PROJECT_BACKUP_USER_HOME}}/.ssh
 
 # Create directory for exporting sql
 RUN mkdir -p /srv/http/sql_backup && chmod 777 /srv/http/sql_backup
 
 # Add GPG keys for encrypting config tars
-COPY public_keys /home/duply/public_keys
-COPY load_developer_keys /home/duply/
-RUN chmod a+rx /home/duply/load_developer_keys
+COPY public_keys {{PROJECT_BACKUP_USER_HOME}}/public_keys
+COPY load_developer_keys {{PROJECT_BACKUP_USER_HOME}}/
+RUN chmod a+rx {{PROJECT_BACKUP_USER_HOME}}/load_developer_keys
 
 # Setup volumes for backup
-RUN install -dm777 /home/duply/backup && \
-  install -dm777 /home/duply/{{PROJECT_BACKUP_CONFIG_BACKUP_DIRECTORY}} && \
-  install -dm777 /home/duply/.cache/duplicity && \
+RUN install -dm777 {{PROJECT_BACKUP_USER_HOME}}/backup && \
+  install -dm777 {{PROJECT_BACKUP_USER_HOME}}/{{PROJECT_BACKUP_CONFIG_BACKUP_DIRECTORY}} && \
+  install -dm777 {{PROJECT_BACKUP_USER_HOME}}/.cache/duplicity && \
   install -dm777 {{PROJECT_BACKUP_SOURCE}}/sql_backup
-VOLUME /home/duply/backup
-VOLUME /home/duply/{{PROJECT_BACKUP_CONFIG_BACKUP_DIRECTORY}}
-VOLUME /home/duply/.cache/duplicity
+VOLUME {{PROJECT_BACKUP_USER_HOME}}/backup
+VOLUME {{PROJECT_BACKUP_USER_HOME}}/{{PROJECT_BACKUP_CONFIG_BACKUP_DIRECTORY}}
+VOLUME {{PROJECT_BACKUP_USER_HOME}}/.cache/duplicity
 VOLUME {{PROJECT_BACKUP_SOURCE}}/sql_backup
 
 # Run as user
-USER duply
+USER {{PROJECT_BACKUP_USER}}
 
 # Build site
-WORKDIR /home/duply
+WORKDIR {{PROJECT_BACKUP_USER_HOME}}
 
 # Load the public keys into key chain for encrypting config tars
 RUN ./load_developer_keys
 
 # Copy backup service script
-COPY backup_service /home/duply/backup_service
+COPY backup_service {{PROJECT_BACKUP_USER_HOME}}/backup_service
 
 # Run backup service script by default
-CMD /home/duply/backup_service
+CMD {{PROJECT_BACKUP_USER_HOME}}/backup_service

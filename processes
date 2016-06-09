@@ -99,7 +99,7 @@ _decompose-process-backup_config() {
 
   if [ ! -z "$cid" ]; then
     echo -n "Copying configuration backup to backup service for remote backup... "
-    docker cp $project_root/$config_backup_dirname/. $cid:/home/duply/$config_backup_dirname
+    docker cp $project_root/$config_backup_dirname/. $cid:"$PROJECT_BACKUP_USER_HOME"/$config_backup_dirname
     echo "Done"
   fi
 }

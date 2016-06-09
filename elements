@@ -4,6 +4,8 @@ PROJECT_BACKUP_INCLUDES=".decompose"
 PROJECT_BACKUP_EXCLUDES=".gitmodules"
 PROJECT_BACKUP_SOURCE="/srv/http/source"
 PROJECT_BACKUP_CONFIG_BACKUP_DIRECTORY="config_backup"
+PROJECT_BACKUP_USER="duply"
+PROJECT_BACKUP_USER_HOME="/home/duply"
 
 # Remote backup server settings
 #PROJECT_BACKUP_GPG_KEY=""
