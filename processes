@@ -27,7 +27,7 @@ Passphrase: $random_passphrase
 EOT
 
   # Get key ID
-  local keyid=$(gpg --no-default-keyring --secret-keyring ./foo.sec --keyring ./foo.pub --list-keys | grep "pub" | sed -n -e 's/^pub.*\///p' | sed -n -e 's/\s*[-0-9]*$//p')
+  local keyid=$(gpg --no-default-keyring --keyid-format=short --secret-keyring ./foo.sec --keyring ./foo.pub --list-keys | grep "pub" | sed -n -e 's/^pub.*\///p' | sed -n -e 's/[[:space:]][0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9] \[SC\]$//p')
 
   # Export public key
   gpg --no-default-keyring --secret-keyring ./foo.sec --keyring ./foo.pub --armour --export > $output_dir/gpgkey."$keyid".pub.asc
