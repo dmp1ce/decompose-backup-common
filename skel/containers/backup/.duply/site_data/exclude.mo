@@ -6,4 +6,4 @@
 # - **
 # for more details see duplicity manpage, section File Selection
 # http://duplicity.nongnu.org/duplicity.1.html#sect9
-
+- {{PROJECT_BACKUP_SOURCE}}/sql_backup

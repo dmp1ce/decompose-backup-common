@@ -1,6 +1,7 @@
 # Provides processes help backup projects
 DECOMPOSE_BACKUP_PROCESSES=( 'backup_config' 'generate_gpg_backup_keys'
-  'generate_backup_server_ssh_access_key' 'list-backups' 'restore-db' )
+  'generate_backup_server_ssh_access_key' 'list-backups' 'restore-db'
+  'backup-db' )
 
 _decompose-process-generate_gpg_backup_keys() {
   echo "Generating GPG backup keys..."
@@ -116,8 +117,8 @@ _decompose-process-list-backups() {
   # Use duply to list backups and command line magic (craziness)
   # TODO: For readability, this code should probably go into a seperate file.
   echo "Backups available from the following dates:"
-  docker exec $cid bash -c "duply site_data status | grep 'Incremental\|Full' | awk '{\$1 = \"\"; \$NF = \"\"; print}' | xargs -I {} date -d \"{}\" \"+%Y-%m-%dT%H:%M:%S%:z\" | xargs -I {} sh -c 'echo \"\$1 (\$(dateutils.ddiff \$1 now -f '%YY%mM%dD%Hh%Mm%Ss') ago)\"' - {}"
-#  docker exec $cid dateutils.ddiff --help
+  local db_backup_name=$(_decompose-process-duply_database_name)
+  docker exec $cid bash -c "duply $db_backup_name status | grep 'Incremental\|Full' | awk '{\$1 = \"\"; \$NF = \"\"; print}' | xargs -I {} date -d \"{}\" \"+%Y-%m-%dT%H:%M:%S%:z\" | xargs -I {} sh -c 'echo \"\$1 (\$(dateutils.ddiff \$1 now -f '%YY%mM%dD%Hh%Mm%Ss') ago)\"' - {}"
 }
 _decompose-process-list-backups_help() {
   echo "  List available backups"
@@ -136,7 +137,8 @@ _decompose-process-restore-db() {
   local cid=$(docker-compose ps -q backup)
 
   # Use duply to restore database backup file
-  docker exec $cid duply site_data fetch sql_backup/app.sql.gz /tmp/app.sql.gz $1
+  local database_backup_name=$(_decompose-process-duply_database_name)
+  docker exec $cid duply $database_backup_name fetch sql_backup/app.sql.gz /tmp/app.sql.gz $1
 
   # Restore
   local password_param=""
@@ -152,4 +154,24 @@ _decompose-process-restore-db_help() {
   echo "  Restore database from a specified date"
 }
 
-# vim:syntax=sh
+_decompose-process-backup-db() {
+  # Get the name of the database container
+  local cid=$(docker-compose ps -q backup)
+
+  # Run backup
+  local database_backup_name=$(_decompose-process-duply_database_name)
+  docker exec $cid duply $database_backup_name backup
+}
+_decompose-process-backup-db_help() {
+  echo "  Manually start backup process"
+}
+
+_decompose-process-duply_database_name() {
+  if [ "$PROJECT_BACKUP_DATABASE_BACKUP" ]; then
+    echo "site_database"
+  else
+    echo "site_data"
+  fi
+}
+
+# vim:syntax=sh tabstop=2 shiftwidth=2 expandtab

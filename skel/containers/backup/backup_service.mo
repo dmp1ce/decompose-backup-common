@@ -7,6 +7,9 @@ sleep 10
 while true; do
   echo "Backing up site data"
   duply site_data backup
+{{#PROJECT_BACKUP_DATABASE_BACKUP}}
+  duply site_database backup
+{{/PROJECT_BACKUP_DATABASE_BACKUP}}
 
   echo "Backing up configuration files"
   # Get all developer keys
@@ -40,4 +43,4 @@ while true; do
   sleep "$sleep_seconds"
 done
 
-# vim: set ft=sh:
+# vim:syntax=sh tabstop=2 shiftwidth=2 expandtab
