@@ -138,7 +138,12 @@ _decompose-process-restore-db() {
 
   # Use duply to restore database backup file
   local database_backup_name=$(_decompose-process-duply_database_name)
-  docker exec $cid duply $database_backup_name fetch sql_backup/app.sql.gz /tmp/app.sql.gz $1
+  if [ $database_backup_name == "site_database" ]; then
+    local base_path=""
+  else
+    local base_path="sql_backup/"
+  fi
+  docker exec $cid duply $database_backup_name fetch $base_path""app.sql.gz /tmp/app.sql.gz $1
 
   # Restore
   local password_param=""
